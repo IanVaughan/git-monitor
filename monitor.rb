@@ -95,8 +95,6 @@ class Monitor
 #    puts message
 #    system "git add -m #{message}"
     system "git add ."
-
-    puts 'end'
   end
 
   def run_commit(file_num, text)
