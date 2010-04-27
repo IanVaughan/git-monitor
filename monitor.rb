@@ -43,9 +43,9 @@ class Monitor
 
   def check_changes
     if !(@last_diff == get_changes)
-      puts
-      puts '---'
-      puts show_changes #get_changes
+#      puts
+      puts "--- #{Time.now}"
+      show_changes
       puts '---'
       @last_diff = get_changes
       true
@@ -92,8 +92,6 @@ class Monitor
 
   def run_add(file_num)
     puts 'add'
-#    puts message
-#    system "git add -m #{message}"
     system "git add ."
   end
 
@@ -103,10 +101,10 @@ class Monitor
       print 'enter commit message:'
       message = gets.chomp
     end
-#    puts "commit #{text}"
     command = "git commit -m \"#{message}\""
     puts command
     system command
+    puts '---'
   end
 
 end
