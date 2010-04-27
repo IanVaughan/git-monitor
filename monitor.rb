@@ -14,6 +14,7 @@ class Monitor
   def menu
     puts 'git monitor menu :-'
     puts '0/q - Quit'
+    puts 'h   - Help'
     puts '1/d - diff'
     puts '2/a - add'
     puts '3/c - commit'
@@ -27,9 +28,19 @@ class Monitor
     `git diff --stat`
   end
   def show_changes
-    system 'git diff --stat'
+    if get_changes.size > 0 then
+      puts "--- #{Time.now} ---"
+      system 'git diff --stat'
+      puts '---'
+    else
+
+
+    end
   end
 
+  def name_only
+    `git diff --name-only`
+  end
 
   def check_changed
     status.include? "nothing to commit"
@@ -43,10 +54,7 @@ class Monitor
 
   def check_changes
     if !(@last_diff == get_changes)
-#      puts
-      puts "--- #{Time.now}"
       show_changes
-      puts '---'
       @last_diff = get_changes
       true
     else
@@ -71,12 +79,14 @@ class Monitor
       input = gets.chomp
       if input.size > 0
         case input[0].upcase
-        when '1' then run_diff(input[1])
+          when '1' then run_diff(input[1])
           when '2' then run_add(input[1])
           when '3' then run_commit(input[1], input[2..10])
           when '0','Q' then running = false
+          when 'H' then menu
           else puts 'error'; menu
         end
+        show_changes
       end
     end
   end
