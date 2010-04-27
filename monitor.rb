@@ -60,7 +60,14 @@ class Monitor
     while true
         print 'Choose:'
         input = gets.chomp
-        puts input
+        case input[0]
+          when '1' then puts 'diff'
+          when '2' then puts 'add'
+          when '3' then puts 'commit'
+          when '0' then puts 'quit'
+          else puts 'error'
+        end
+
     end
   end
 
