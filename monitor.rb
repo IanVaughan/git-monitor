@@ -48,16 +48,19 @@ class Monitor
   end
 
   def run
-    while true
-      monitor_change
-      if check_changes
-        Thread.new {
-          puts 'test'
-
-          }
-      else
+    monitor = Thread.new do
+      while true
+        monitor_change
+        check_changes
         sleep 1
       end
+    end
+    sleep 1
+
+    while true
+        print 'Choose:'
+        input = gets.chomp
+        puts input
     end
   end
 
