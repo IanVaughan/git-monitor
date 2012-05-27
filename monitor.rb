@@ -21,8 +21,13 @@ class Monitor
   end
 
   def status
-    `git st`
+    `git status`
   end
+
+  def status_short
+    `git status -s`
+  end
+
 
   def get_changes
     `git diff --stat`
@@ -79,7 +84,7 @@ class Monitor
       input = gets.chomp
       if input.size > 0
         case input[0].upcase
-          when '1' then run_diff(input[1])
+          when '1' then run_diff(input[1..input.length])
           when '2' then run_add(input[1])
           when '3' then run_commit(input[1], input[2..10])
           when '0','Q' then running = false
@@ -91,10 +96,12 @@ class Monitor
     end
   end
 
-  def run_diff(file_number)
-    puts "diff #{file_number}"
-    if file_number
-      system 'git diff'
+  # allow filename or number in list
+  def run_diff(file_name_number)
+    puts "diff #{file_name_number}"
+#    if file_name_number.to_i.istypeofint
+    if file_name_number
+      system "git diff #{file_name_number}"
     else
       system 'git diff'
     end
