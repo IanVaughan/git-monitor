@@ -1,10 +1,34 @@
+class Git
+  class << self
+    def status(short = false)
+      short ? `git status -s` : `git status`
+    end
+
+    def get_changes
+      `git diff --stat`
+    end
+
+    def name_only
+      `git diff --name-only`
+    end
+
+    def is_a_git_repo?
+      !status.include? "Not a git repository"
+    end
+
+    def changed?
+      status.include? "nothing to commit"
+    end
+  end
+end
+
+class Commands
+end
+
 class Monitor
-
-  @last_diff
-
   def initialize
     @last_diff = ''
-    if status.include? "Not a git repository" then
+    if !Git.is_a_git_repo?
       puts 'Not a git repository!'
       return 0
     end
@@ -20,76 +44,48 @@ class Monitor
     puts '3/c - commit'
   end
 
-  def status
-    `git status`
-  end
-
-  def status_short
-    `git status -s`
-  end
-
-
-  def get_changes
-    `git diff --stat`
-  end
   def show_changes
-    if get_changes.size > 0 then
+    if Git.get_changes.size > 0
       puts "--- #{Time.now} ---"
-      system 'git diff --stat'
+      #Git.get_changes
+      system 'git --no-pager diff --stat'
       puts '---'
-    else
-
-
     end
   end
 
-  def name_only
-    `git diff --name-only`
-  end
-
-  def check_changed
-    status.include? "nothing to commit"
-  end
-
   def monitor_change
-    while check_changed
+    while Git.changed?
       sleep 1
     end
   end
 
   def check_changes
-    if !(@last_diff == get_changes)
+    if !(@last_diff == Git.get_changes)
       show_changes
-      @last_diff = get_changes
-      true
-    else
-      @last_diff = get_changes
-      false
     end
+    @last_diff = Git.get_changes
   end
 
   def run
     monitor = Thread.new do
       while true
-        monitor_change
+        #monitor_change
         check_changes
         sleep 1
       end
     end
-    sleep 1
 
     running = true
     while running
-#      print 'Choose:'
       input = gets.chomp
       if input.size > 0
         case input[0].upcase
-          when '1' then run_diff(input[1..input.length])
-          when '2' then run_add(input[1])
-          when '3' then run_commit(input[1], input[2..10])
-          when '0','Q' then running = false
-          when 'H' then menu
-          else puts 'error'; menu
+        when '1','D' then run_diff(input[1..input.length])
+        when '2','A' then run_add(input[1])
+        when '3','C' then run_commit(input[1], input[2..10])
+        when '0','Q' then running = false
+        when 'H' then menu
+        else puts 'error'; menu
         end
         show_changes
       end
@@ -99,7 +95,7 @@ class Monitor
   # allow filename or number in list
   def run_diff(file_name_number)
     puts "diff #{file_name_number}"
-#    if file_name_number.to_i.istypeofint
+     #    if file_name_number.to_i.istypeofint
     if file_name_number
       system "git diff #{file_name_number}"
     else
@@ -123,8 +119,6 @@ class Monitor
     system command
     puts '---'
   end
-
 end
 
 Monitor.new.run
-
